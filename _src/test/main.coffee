@@ -22,9 +22,14 @@ describe "----- warni TESTS -----", ->
 
 		# Implement tests cases here
 		it "wait for a warning", ( done )->
-			_data = randoms.obj.string(5)
-			_warni.issue( _data )
-			done()
+			_data = null
+			_warni.once "warning", ( data )->
+				data.should.eql( _data )
+				done()
+				return
+			for idx in [0..2]
+				_data = randoms.obj.string(5)
+				_warni.issue( _data )
 			return
 
 		return
