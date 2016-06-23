@@ -1,0 +1,32 @@
+VERSIONS[0]=6.1
+VERSIONS[1]=5.4
+VERSIONS[2]=4.4
+VERSIONS[3]=0.12
+VERSIONS[4]=lts
+VERSIONS[5]=latest
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+SCRIPTDIR="dockertests"
+cd $DIR
+cd ..
+
+for version in "${VERSIONS[@]}"
+do
+   :
+   FV=`echo $version | sed 's/\./_/'`
+   DFile="Dockerfile.$FV"
+   if [ -f "$SCRIPTDIR/$DFile" ]; then
+	   echo "TEST Version: $version"
+	   BUILDLOGS="$DIR/dockerbuild.$version.log"
+	   rm -f $BUILDLOGS
+	   echo "Start build ..."
+	   docker build -t=mpneuried.warni.dockertest.$version -f=$SCRIPTDIR/$DFile . > $BUILDLOGS
+	   echo "Run test ..."
+	   docker run --name=mpneuried.warni.dockertest.$version mpneuried.warni.dockertest.$version >&2
+	   echo "Remove container ..."
+	   docker rm mpneuried.warni.dockertest.$version >&2
+   else
+	   echo "Dockerfile '$DFile' not found"
+   fi
+done
