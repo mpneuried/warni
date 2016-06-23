@@ -24,6 +24,7 @@ describe "----- warni TESTS -----", ->
 		it "wait for a warning", ( done )->
 			_data = randoms.obj.string(5)
 			_warni.issue( _data )
+			done()
 			return
 
 		return
