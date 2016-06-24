@@ -5,7 +5,7 @@
 #
 # ### Exports: *Class*
 #
-# Main Module
+# A helper to count alerts and send warnings or alerts not on every event.
 #
 
 class Warni extends require('mpbasic')()
@@ -39,17 +39,17 @@ class Warni extends require('mpbasic')()
 		if @issueCount >= @config.warn and not @warningSend
 			@warningSend = true
 			@emit( "warning", data, @issueCount )
-		return
+		return @
 		
 	ok: ( data )=>
 		_count = @issueCount
 		@warningSend = false
 		@issueCount = 0
 		@alertCount = 0
-		# only send "OK" if there was at least a warning or anissues before
+		# only send "OK" if there was at least a warning before
 		if _count > 0 and _count >= @config.warn
 			@emit( "ok", data, _count )
-		return
+		return @
 	
 	count: =>
 		return @issueCount

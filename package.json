@@ -1,6 +1,6 @@
 {
 	"name": "warni",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A helper to count alerts and send warnings or alerts not on every event.",
 	"keywords": [],
 	"homepage": "https://github.com/mpneuried/warni",

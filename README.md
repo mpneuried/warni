@@ -19,17 +19,110 @@ A helper to count alerts and send warnings or alerts not on every event.
 ## Initialize
 
 ```js
-  // TODO init code
+	var warnings = new Warni( { warn: 2, alert: 5, resend: 10 } );
+	
+	// listen to warnings
+	warnings.on( "warning", function( data, count ){
+		// generate your warning by sending it via Mail, Slack, HTTP or just log it to the console.
+		console.warning( "WARNING! Got `" + count + "` issues of `" + data.title + "`\n" + data.details  )
+	});
+	
+	// listen to alerts
+	warnings.on( "alert", function( data, count ){
+		// generate your warning by sending it via Mail, Slack, HTTP or just log it to the console.
+		console.error( "ERROR! Got `" + count + "` issues of `" + data.title + "`\n" + data.details  )
+	});
+	
+	// listen to the event until the ok was called.
+	warnings.on( "ok", function( data, count ){
+		// generate your warning by sending it via Mail, Slack, HTTP or just log it to the console.
+		console.error( "OK! Back to normal operation after `" + count + "` issues of `" + data.title + "`\n" + data.details  )
+	});
+	
+	// generate some issues
+	for (idx = i = 0; i <= 110; idx = ++i) {
+		warnings.issue( { title: "Huuuaaahhh 👻 an Error ...", details: "Just Testing ;-) with index " + idx } )
+	}
+	// by the configuration above th following events will be fired at index:
+	// - idx=2: a warning event 
+	// - idx=5: the first alert
+	// - idx=50: the second alert (a resend)
+	// - idx=100: the third alert (a resend)
+	
+	
+	// if everthing is operating normal you should call
+	warnings.ok( { title: "OK 👍🏼", details: "Relax ... 🍹" } )
+	
 ```
 
-**Options** 
+**Config-Options** 
 
-- **foo** : *( `String` required )* TODO option description
-- **bar** : *( `Number` optional: default = `123` )* TODO option description
+- **warn** : *( `Number` optional: default = `2` )* Number of `.issue()` calls needed to send a warning event. A warning event will only fired once between an `ok()` and an `alert` event.
+- **alert** : *( `Number` optional: default = `5` )* Alert of `.issue()` calls to send a alert event
+- **alert** : *( `Number` optional: default = `10` )* Resend a new alert event after x alert events. So only do the next alert event after `alert` * `resend` calls of `.issue()`
 
-## Todos
+## Methods
 
- * implement test cases to check for correct template generation.
+#### `.issue( [data] )`
+
+Report a problem.
+
+**Arguments** 
+
+- **data** : *( `Any` optional )* Additional data to describe the issue within your event handlers
+
+**Return**
+
+*( Warni )*: The instance itself for chaining 
+
+
+#### `.ok( [data] )`
+
+Tell Warni everything is ok and reset the issue counter if needed.
+
+**Arguments** 
+
+- **data** : *( `Any` optional )* Additional data to describe the issue within your event handlers
+
+**Return**
+
+*( Warni )*: The instance itself for chaining 
+
+## Events
+
+#### `warning`
+
+An early warning, that something is fishy ;-).
+This is triggered once after `.issue()` iwas called `config.warn` times.
+
+**Arguments** 
+
+- **data** : *( `Any` )* The latest issue data you passed to `.issue(data)`
+- **count** : *( `Number` )* The count of issues called until now.
+
+#### `alert`
+
+Generate an alert.
+This is triggered if `.issue()` was called for `config.alert` or `config.alert * config.resend` times.
+
+**Arguments** 
+
+- **data** : *( `Any` )* The latest issue data you passed to `.issue(data)`
+- **count** : *( `Number` )* The count of issues called until now.
+
+#### `ok`
+
+Reported issues is gone.
+Triggered when `.ok(data)` was called after a `warning` event was triggered.
+
+**Arguments** 
+
+- **data** : *( `Any` )* The latest issue data you passed to `.issue(data)`
+- **count** : *( `Number` )* The count of issues before the `.ok()` was called.
+
+## Todos/Ideas
+
+ * define a time in seconds until the next alert resend is allowed. With an increase of the time with every alert. 
 
 ## Testing
 
@@ -77,7 +170,8 @@ To run the tests through the defined versions run the following command:
 ## Release History
 |Version|Date|Description|
 |:--:|:--:|:--|
-|0.0.1|2016-6-23|Initial commit|
+|0.0.2|2016-6-24|Added docs and return itself on `ok` and `issue`|
+|0.0.1|2016-6-23|Initial version|
 
 [![NPM](https://nodei.co/npm-dl/warni.png?months=6)](https://nodei.co/npm/warni/)
 
